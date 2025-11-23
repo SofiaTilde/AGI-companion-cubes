@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Dispenser
   - Pan
+  - Pancake
   layers:
   - Default
   - TransparentFX

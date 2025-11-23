@@ -411,6 +411,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3266131744826605730}
   - component: {fileID: 4806226677201817061}
+  - component: {fileID: 1675374701053841008}
   m_Layer: 0
   m_Name: PancakeArmature
   m_TagString: Untagged
@@ -457,6 +458,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1675374701053841008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1798727793383392210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62e5801a774af504d833edf45a0b87cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  batter_units: 0
 --- !u!1 &2516124189497829413
 GameObject:
   m_ObjectHideFlags: 0
@@ -717,7 +731,7 @@ GameObject:
   - component: {fileID: 882664817417983864}
   m_Layer: 0
   m_Name: PancakeObject
-  m_TagString: Untagged
+  m_TagString: Pancake
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -731,7 +745,7 @@ Transform:
   m_GameObject: {fileID: 5853483820937420210}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -0, y: 0.038644016, z: 1}
+  m_LocalPosition: {x: 0, y: 0.08464402, z: 1}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -763,7 +777,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
@@ -1031,7 +1045,7 @@ Transform:
   m_GameObject: {fileID: 9002988622193509407}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 0.046, z: -0}
   m_LocalScale: {x: 1, y: 0.038644012, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

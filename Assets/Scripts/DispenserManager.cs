@@ -136,7 +136,12 @@ public class DispenserManager : MonoBehaviour
     private void TryConsumeOneSet()
     {
         // only consume if we have at least 1 of each and if the pan does not have the maximum amount of batter
-        if (current_eggs > 0 && current_milk > 0 && current_flour > 0 && panManager.batter_units < panManager.MAX_BATTER_UNITS)
+        int current_pancake_size = 0;
+
+        if(panManager.spawnedPancake != null)
+            current_pancake_size = panManager.spawnedPancake.GetComponent<PancakeData>().batter_units;
+
+        if (current_eggs > 0 && current_milk > 0 && current_flour > 0 && current_pancake_size < panManager.MAX_BATTER_UNITS)
         {
             current_eggs--;
             current_milk--;
@@ -147,8 +152,6 @@ public class DispenserManager : MonoBehaviour
             UpdateFiller(flour_filler, current_flour);
 
             panManager.AddBatter();
-
-            // to do: trigger pouring logic
         }
     }
 
