@@ -15,7 +15,7 @@
 			<t></t>
 		</Share>
 		<Action sr="act0" ve="7">
-			<code>547</code>
+			<code>546</code>
 			<label>IP or Domain</label>
 			<Str sr="arg0" ve="3">%ip_server</Str>
 			<Str sr="arg1" ve="3">255.255.255.255</Str>
@@ -28,8 +28,8 @@
 		<Action sr="act1" ve="7">
 			<code>547</code>
 			<label>Port</label>
-			<Str sr="arg0" ve="3">%port</Str>
-			<Str sr="arg1" ve="3">45055</Str>
+			<Str sr="arg0" ve="3">%port</Str> 
+			<Str sr="arg1" ve="3">50000</Str>
 			<Int sr="arg2" val="0"/>
 			<Int sr="arg3" val="0"/>
 			<Int sr="arg4" val="0"/>
