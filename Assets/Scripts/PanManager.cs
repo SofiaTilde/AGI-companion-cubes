@@ -88,9 +88,9 @@ public class PanManager : MonoBehaviour
             return;
         }
 
-        spawnedPancake.transform.SetParent(null);
-        rb.useGravity = true;
-        rb.isKinematic = false;
+        //spawnedPancake.transform.SetParent(null);
+        //rb.useGravity = true;
+        //rb.isKinematic = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -99,6 +99,12 @@ public class PanManager : MonoBehaviour
         {
             has_pancake = true;
             Debug.Log("has pancake = TRUE");
+        }
+        else if (other.CompareTag("Deleter"))
+        {
+            has_pancake = false;
+            Destroy(spawnedPancake);
+            spawnedPancake = null;
         }
     }
 
