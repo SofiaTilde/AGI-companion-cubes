@@ -1,39 +1,84 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using UnityEngine;
 
 public class udp_listener : MonoBehaviour
 {
-    private UdpClient udpClient;
-    private IPEndPoint remoteEndPoint;
+    private UdpClient udpClient = null!;
 
-    private void Start()
-    {
-        // Example: Start the UDP client and connect to the remote server
-        StartUDPClient(50000);
-    }
+    // private Thread receiveThread = null!;
+    private int port = 50000;
 
-    private void StartUDPClient(int port)
+    // private string receivedMessage = null;
+    // private readonly object messageLock = new object();
+
+    void Start()
     {
-        Debug.Log($"UDP receiving data on port {port}");
-        udpClient = new UdpClient();
+        udpClient = new UdpClient(port);
         udpClient.EnableBroadcast = true;
+        // receiveThread = new Thread(ReceiveData);
+        // receiveThread.IsBackground = true;
+        // receiveThread.Start();
 
-        remoteEndPoint = new IPEndPoint(IPAddress.Any, port);
-
-        // Start receiving data asynchronously
-        udpClient.BeginReceive(ReceiveData, null);
+        Debug.Log("UDP listening on port " + port);
     }
 
-    private void ReceiveData(IAsyncResult result)
+    // private void ReceiveData()
+    // {
+    //     while (true)
+    //     {
+    //         IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, port);
+    //         byte[] data = udpClient.Receive(ref remoteEP);
+    //         string message = Encoding.UTF8.GetString(data);
+
+    //         lock (messageLock)
+    //         {
+    //             receivedMessage = message;
+    //         }
+    //     }
+    // }
+
+    void Update()
     {
-        byte[] receivedBytes = udpClient.EndReceive(result, ref remoteEndPoint);
-        string receivedMessage = System.Text.Encoding.UTF8.GetString(receivedBytes);
-
-        Debug.Log("Received from server: " + receivedMessage);
-
-        // Continue receiving data asynchronously
-        udpClient.BeginReceive(ReceiveData, null);
+        try
+        {
+            while (udpClient.Available > 0)
+            {
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, port);
+                byte[] data = udpClient.Receive(ref remoteEP);
+                string message = Encoding.UTF8.GetString(data);
+                Debug.Log("UDP Received: " + message);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("UDP Error: " + ex.Message);
+        }
     }
+
+    void OnApplicationQuit()
+    {
+        udpClient?.Close();
+    }
+    // void Update()
+    // {
+    //     string messageToHandle = null;
+
+    //     lock (messageLock)
+    //     {
+    //         if (!string.IsNullOrEmpty(receivedMessage))
+    //         {
+    //             messageToHandle = receivedMessage;
+    //             receivedMessage = null;
+    //         }
+    //     }
+
+    //     if (!string.IsNullOrEmpty(messageToHandle))
+    //     {
+    //         Debug.Log("UDP Received: " + messageToHandle);
+    //     }
+    // }
 }
