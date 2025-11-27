@@ -9,37 +9,16 @@ public class udp_listener : MonoBehaviour
 {
     private UdpClient udpClient = null!;
 
-    // private Thread receiveThread = null!;
     private int port = 50000;
-
-    // private string receivedMessage = null;
-    // private readonly object messageLock = new object();
 
     void Start()
     {
         udpClient = new UdpClient(port);
+        //listens to the broadcast address 255.255.255.255 https://en.wikipedia.org/wiki/Broadcast_address
         udpClient.EnableBroadcast = true;
-        // receiveThread = new Thread(ReceiveData);
-        // receiveThread.IsBackground = true;
-        // receiveThread.Start();
 
         Debug.Log("UDP listening on port " + port);
     }
-
-    // private void ReceiveData()
-    // {
-    //     while (true)
-    //     {
-    //         IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, port);
-    //         byte[] data = udpClient.Receive(ref remoteEP);
-    //         string message = Encoding.UTF8.GetString(data);
-
-    //         lock (messageLock)
-    //         {
-    //             receivedMessage = message;
-    //         }
-    //     }
-    // }
 
     void Update()
     {
@@ -47,7 +26,9 @@ public class udp_listener : MonoBehaviour
         {
             while (udpClient.Available > 0)
             {
+                //connect to "any" ip address, in this case the broadcast address
                 IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, port);
+                //see if there is a message that has been sent, if so print it
                 byte[] data = udpClient.Receive(ref remoteEP);
                 string message = Encoding.UTF8.GetString(data);
                 Debug.Log("UDP Received: " + message);
@@ -63,22 +44,4 @@ public class udp_listener : MonoBehaviour
     {
         udpClient?.Close();
     }
-    // void Update()
-    // {
-    //     string messageToHandle = null;
-
-    //     lock (messageLock)
-    //     {
-    //         if (!string.IsNullOrEmpty(receivedMessage))
-    //         {
-    //             messageToHandle = receivedMessage;
-    //             receivedMessage = null;
-    //         }
-    //     }
-
-    //     if (!string.IsNullOrEmpty(messageToHandle))
-    //     {
-    //         Debug.Log("UDP Received: " + messageToHandle);
-    //     }
-    // }
 }
