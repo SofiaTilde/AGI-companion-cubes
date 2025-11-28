@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class udp_listener : MonoBehaviour
 {
+    public NFC_Simulator nfc_sim; 
+
     private UdpClient udpClient = null!;
 
     private int port = 50000;
@@ -32,6 +34,20 @@ public class udp_listener : MonoBehaviour
                 byte[] data = udpClient.Receive(ref remoteEP);
                 string message = Encoding.UTF8.GetString(data);
                 Debug.Log("UDP Received: " + message);
+
+                if(message == "eggs")
+                {
+                    nfc_sim.TriggerEggEvent();
+                }
+                else if (message == "milk")
+                {
+                    nfc_sim.TriggerMilkEvent();
+                }
+                else if (message == "flour")
+                {
+                    nfc_sim.TriggerFlourEvent();
+                }
+
             }
         }
         catch (Exception ex)
@@ -44,4 +60,5 @@ public class udp_listener : MonoBehaviour
     {
         udpClient?.Close();
     }
+
 }
