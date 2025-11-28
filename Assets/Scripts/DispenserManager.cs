@@ -11,9 +11,9 @@ public class DispenserManager : MonoBehaviour
     [SerializeField] private Image flour_filler;
 
     // current amount of ingredients
-    private int current_eggs = 0;
-    private int current_milk = 0;
-    private int current_flour = 0;
+    private int current_eggs = 2;
+    private int current_milk = 2;
+    private int current_flour = 2;
 
     private const int MAX_ITEMS = 5; // max items per type of ingredient
 
@@ -92,6 +92,8 @@ public class DispenserManager : MonoBehaviour
     {
         if (!other.CompareTag("Pan")) return;
 
+        Debug.Log("Pan enter event triggered");
+
         panInside = true;
 
         // dispense one unit of batter (1x egg, 1x milk, 1x flour)
@@ -107,6 +109,8 @@ public class DispenserManager : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Pan")) return;
+
+        Debug.Log("Pan exit event triggered");
 
         panInside = false;
 
