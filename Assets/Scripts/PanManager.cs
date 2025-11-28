@@ -26,7 +26,7 @@ public class PanManager : MonoBehaviour
 
             spawnedPancake = Instantiate(pancake, spawnPos, Quaternion.identity);
             spawnedPancake.transform.localScale = Vector3.one * scales[0];
-            spawnedPancake.transform.SetParent(transform); // set the pan as the parent (temporarily)
+            //spawnedPancake.transform.SetParent(transform); // set the pan as the parent (temporarily)
             has_pancake = true;
 
             spawnedPancake.GetComponent<PancakeData>().batter_units++;
