@@ -1397,6 +1397,7 @@ GameObject:
   m_Component:
   - component: {fileID: 850304277}
   - component: {fileID: 850304276}
+  - component: {fileID: 850304278}
   m_Layer: 0
   m_Name: NFC_Simulator
   m_TagString: Untagged
@@ -1431,6 +1432,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850304278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850304275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7db5732974c66498e10c9f4f6b8073, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nfc_sim: {fileID: 850304276}
 --- !u!1 &862335529
 GameObject:
   m_ObjectHideFlags: 0
