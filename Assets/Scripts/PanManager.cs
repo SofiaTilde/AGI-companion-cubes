@@ -9,7 +9,12 @@ public class PanManager : MonoBehaviour
     [SerializeField] private GameObject pancake; // this pancake is a prefab
 
     private bool has_pancake = false;
-    public GameObject spawnedPancake;           // runtime instance
+    [System.NonSerialized] public GameObject spawnedPancake;  // runtime instance
+
+    // particle system
+    [SerializeField] private GameObject ps_splash;
+    [SerializeField] private GameObject ps_cooking;
+    [SerializeField] private GameObject ps_overcooked;
 
     public void AddBatter()
     {
@@ -26,10 +31,14 @@ public class PanManager : MonoBehaviour
 
             spawnedPancake = Instantiate(pancake, spawnPos, Quaternion.identity);
             spawnedPancake.transform.localScale = Vector3.one * scales[0];
-            //spawnedPancake.transform.SetParent(transform); // set the pan as the parent (temporarily)
+            spawnedPancake.transform.SetParent(transform); // set the pan as the parent (temporarily)
             has_pancake = true;
 
             spawnedPancake.GetComponent<PancakeData>().batter_units++;
+
+            // particle system: splash
+            ps_splash.SetActive(true);
+            ps_splash.GetComponent<ParticleSystem>().Play();
         }
         else
         {
@@ -51,6 +60,10 @@ public class PanManager : MonoBehaviour
                 float toSize = scales[size];
 
                 spawnedPancake.GetComponent<PancakeData>().batter_units++;
+
+                // particle system: splash
+                ps_splash.SetActive(true);
+                ps_splash.GetComponent<ParticleSystem>().Play();
 
                 StopAllCoroutines(); 
                 StartCoroutine(AnimateScale(
@@ -89,8 +102,25 @@ public class PanManager : MonoBehaviour
         }
 
         //spawnedPancake.transform.SetParent(null);
-        //rb.useGravity = true;
-        //rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.isKinematic = false;
+    }
+
+    public void Trigger_PS_cooking()
+    {
+        ps_cooking.SetActive(true);
+        ps_cooking.GetComponent<ParticleSystem>().Play();
+    }
+
+    public void Stop_PS_cooking()
+    {
+        ps_cooking.SetActive(false);
+    }
+
+    public void Trigger_PS_overcooked()
+    {
+        ps_overcooked.SetActive(true);
+        ps_overcooked.GetComponent<ParticleSystem>().Play();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -118,7 +148,6 @@ public class PanManager : MonoBehaviour
         }
     }
 
-
     private IEnumerator AnimateScale(Transform target, Vector3 from, Vector3 to, float duration)
     {
         float t = 0f;
@@ -134,6 +163,5 @@ public class PanManager : MonoBehaviour
 
         target.localScale = to;
     }
-
 
 }

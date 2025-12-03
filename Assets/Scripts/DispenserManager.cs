@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class DispenserManager : MonoBehaviour
 {
-    [SerializeField] private PanManager panManager; 
+    [SerializeField] private PanManager panManager;
 
     // image fillers 
     [SerializeField] private Image egg_filler;
@@ -11,9 +11,9 @@ public class DispenserManager : MonoBehaviour
     [SerializeField] private Image flour_filler;
 
     // current amount of ingredients
-    private int current_eggs = 2;
-    private int current_milk = 2;
-    private int current_flour = 2;
+    private int current_eggs = 0;
+    private int current_milk = 0;
+    private int current_flour = 0;
 
     private const int MAX_ITEMS = 5; // max items per type of ingredient
 
@@ -92,8 +92,6 @@ public class DispenserManager : MonoBehaviour
     {
         if (!other.CompareTag("Pan")) return;
 
-        Debug.Log("Pan enter event triggered");
-
         panInside = true;
 
         // dispense one unit of batter (1x egg, 1x milk, 1x flour)
@@ -109,8 +107,6 @@ public class DispenserManager : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Pan")) return;
-
-        Debug.Log("Pan exit event triggered");
 
         panInside = false;
 
@@ -142,7 +138,7 @@ public class DispenserManager : MonoBehaviour
         // only consume if we have at least 1 of each and if the pan does not have the maximum amount of batter
         int current_pancake_size = 0;
 
-        if(panManager.spawnedPancake != null)
+        if (panManager.spawnedPancake != null)
             current_pancake_size = panManager.spawnedPancake.GetComponent<PancakeData>().batter_units;
 
         if (current_eggs > 0 && current_milk > 0 && current_flour > 0 && current_pancake_size < panManager.MAX_BATTER_UNITS)
