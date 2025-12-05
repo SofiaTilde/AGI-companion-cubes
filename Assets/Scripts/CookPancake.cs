@@ -2,27 +2,25 @@ using UnityEngine;
 
 public class CookPancake : MonoBehaviour
 {
-    [Header("Pancake Materials")]
-    public Material pancakeRaw;
-    public Material pancakeCooked;
-    public Material pancakeBurnt;
-
     [Header("Cooking Times (seconds)")]
     public float timeToCook = 4f;   
     public float timeToBurn = 8f;
 
-    public PanManager pan; 
+    public PanManager pan;
+    public OrderingSystem ordering_system;
 
     private bool pancakeInside = false;
     private float cookTimer = 0f;
 
-    private Renderer pancakeRenderer;
     private bool triggered_burnt = false;
-    private int cooking_state = 0; 
+    private bool triggered_step2 = false;
+    private bool triggered_ps_cooking = false;
+
+    private GameObject current_pancake; // TODO: EL COMPONENT PARA COOK ESTÁ EN EL PARENT DEL PANCAKE, NO EN EL COLLIDER DEL PANCAKE!
 
     private void Update()
     {
-        if (!pancakeInside || pancakeRenderer == null)
+        if (!pancakeInside)
         {
             pan.Stop_PS_cooking();
             return;
@@ -35,23 +33,30 @@ public class CookPancake : MonoBehaviour
         {
             if (!triggered_burnt)
             {
-                pan.Trigger_PS_overcooked();
                 triggered_burnt = true;
-                cooking_state = 2;
-            }
-            
-            pancakeRenderer.material = pancakeBurnt;
+
+                pan.Trigger_PS_overcooked();
+                current_pancake.GetComponent<PancakeData>().Cook();
+            }    
         }
         else if (cookTimer >= timeToCook)
         {
-            cooking_state = 1;
-            pancakeRenderer.material = pancakeCooked;
+            if (!triggered_step2)
+            {
+                triggered_step2 = true;
+
+                ordering_system.Start_Step2();
+                current_pancake.GetComponent<PancakeData>().Cook();
+            }
         }
         else
         {
-            pan.Trigger_PS_cooking();
-            cooking_state = 0;
-            pancakeRenderer.material = pancakeRaw;
+            if (!triggered_ps_cooking)
+            {
+                triggered_ps_cooking = true;
+
+                pan.Trigger_PS_cooking();
+            }
         }
     }
 
@@ -61,24 +66,13 @@ public class CookPancake : MonoBehaviour
             return;
 
         triggered_burnt = false;
+        triggered_step2 = false;
+        triggered_ps_cooking = false;
+
         pancakeInside = true;
         cookTimer = 0f;
 
-        // "the material is in the parent of the pancake, then the first child"
-        // so: parent -> child[0] -> Renderer
-        Transform parent = other.transform.parent != null ? other.transform.parent : other.transform;
-        Transform firstChild = parent.childCount > 0 ? parent.GetChild(0) : parent;
-
-        pancakeRenderer = firstChild.GetComponent<Renderer>();
-
-        if (pancakeRenderer == null)
-        {
-            Debug.LogWarning("CookPancake: Could not find Renderer on parent/first child of pancake.");
-        }
-        else
-        {
-            pancakeRenderer.material = pancakeRaw;
-        }
+        current_pancake = other.transform.gameObject;
     }
 
     private void OnTriggerExit(Collider other)
@@ -86,12 +80,10 @@ public class CookPancake : MonoBehaviour
         if (!other.CompareTag("Pancake"))
             return;
 
-        other.transform.gameObject.GetComponent<PancakeData>().state = cooking_state; // save if the pancake is burnt or not
-        cooking_state = 0;
         pancakeInside = false;
         cookTimer = 0f;
-        pancakeRenderer = null;
 
+        current_pancake = null;
     }
 
 }

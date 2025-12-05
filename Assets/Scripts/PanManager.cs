@@ -11,6 +11,8 @@ public class PanManager : MonoBehaviour
     private bool has_pancake = false;
     [System.NonSerialized] public GameObject spawnedPancake;  // runtime instance
 
+    public OrderingSystem ordering_system; 
+
     // particle system
     [SerializeField] private GameObject ps_splash;
     [SerializeField] private GameObject ps_cooking;
@@ -102,8 +104,8 @@ public class PanManager : MonoBehaviour
         }
 
         //spawnedPancake.transform.SetParent(null);
-        rb.useGravity = true;
-        rb.isKinematic = false;
+        //rb.useGravity = true;
+        //rb.isKinematic = false;
     }
 
     public void Trigger_PS_cooking()
@@ -128,13 +130,24 @@ public class PanManager : MonoBehaviour
         if (other.CompareTag("Pancake"))
         {
             has_pancake = true;
+            spawnedPancake = other.transform.parent.gameObject;
             Debug.Log("has pancake = TRUE");
         }
         else if (other.CompareTag("Deleter"))
         {
+            if (spawnedPancake != null)
+            {
+                Debug.Log(spawnedPancake.gameObject.name);
+                Destroy(spawnedPancake);
+            }
+            else
+            {
+                Debug.Log("Pancake is null");
+            }
+
             has_pancake = false;
-            Destroy(spawnedPancake);
             spawnedPancake = null;
+            ordering_system.CurrentOrderFinished();
         }
     }
 

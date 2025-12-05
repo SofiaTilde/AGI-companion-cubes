@@ -470,6 +470,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62e5801a774af504d833edf45a0b87cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pancakeRaw: {fileID: 2100000, guid: b78ca4a8fcb08ac4cadf571870f97259, type: 2}
+  pancakeCooked: {fileID: 2100000, guid: bc3e3055531721a45bc13caf91e4a090, type: 2}
+  pancakeBurnt: {fileID: 2100000, guid: 7c08e7f6a5d4b6d4bbd9f18490767e34, type: 2}
   batter_units: 0
   state: 0
 --- !u!1 &2516124189497829413
