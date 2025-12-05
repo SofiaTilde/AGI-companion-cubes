@@ -102,8 +102,8 @@ public class PanManager : MonoBehaviour
         }
 
         //spawnedPancake.transform.SetParent(null);
-        rb.useGravity = true;
-        rb.isKinematic = false;
+        //rb.useGravity = true;
+        //rb.isKinematic = false;
     }
 
     public void Trigger_PS_cooking()

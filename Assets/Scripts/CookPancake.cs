@@ -24,7 +24,7 @@ public class CookPancake : MonoBehaviour
     {
         if (!pancakeInside || pancakeRenderer == null)
         {
-            pan.Stop_PS_cooking();
+            //pan.Stop_PS_cooking();
             return;
         }
 
