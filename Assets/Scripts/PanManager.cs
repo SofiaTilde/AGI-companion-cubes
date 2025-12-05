@@ -146,20 +146,31 @@ public class PanManager : MonoBehaviour
         }
         else if (other.CompareTag("Deleter"))
         {
+            DestroyPancake(other);
+        }
+    }
+
+    public void DestroyPancake(Collider other)
+    {
+        if (spawnedPancake != null)
+        {
             if (spawnedPancake != null)
             {
-                Debug.Log(spawnedPancake.gameObject.name);
                 Destroy(spawnedPancake);
             }
-            else
+            if (other != null)
             {
-                Debug.Log("Pancake is null");
+                Destroy(other.transform.parent.gameObject);
             }
-
-            has_pancake = false;
-            spawnedPancake = null;
-            ordering_system.CurrentOrderFinished();
         }
+        else
+        {
+            Debug.Log("Pancake is null");
+        }
+
+        has_pancake = false;
+        spawnedPancake = null;
+        ordering_system.CurrentOrderFinished();
     }
 
     private void OnTriggerExit(Collider other)
