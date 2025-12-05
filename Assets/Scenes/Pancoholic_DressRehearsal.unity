@@ -2417,6 +2417,7 @@ MonoBehaviour:
   timeToCook: 4
   timeToBurn: 8
   pan: {fileID: 1775329439}
+  ordering_system: {fileID: 1039254912}
 --- !u!1 &903490373
 GameObject:
   m_ObjectHideFlags: 0
@@ -5040,6 +5041,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MAX_BATTER_UNITS: 3
   pancake: {fileID: 1798727793383392210, guid: 17b8a7f2ca6693b45a42b05d80e6b966, type: 3}
+  ordering_system: {fileID: 1039254912}
   ps_splash: {fileID: 5564689998881260498}
   ps_cooking: {fileID: 3040550889685961381}
   ps_overcooked: {fileID: 8517818086145596292}
@@ -5062,8 +5064,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.37456116, y: 0.09686661, z: 0.3516012}
-  m_Center: {x: 0.011828892, y: 0.048433304, z: 0.00028651953}
+  m_Size: {x: 0.37456116, y: 0.15501785, z: 0.3516012}
+  m_Center: {x: 0.011828899, y: 0.019357681, z: 0.00028651953}
 --- !u!1 &1777180011
 GameObject:
   m_ObjectHideFlags: 0
@@ -49826,7 +49828,7 @@ Transform:
   m_GameObject: {fileID: 4666133493434551351}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -1.734, y: 1.303, z: 3.318}
+  m_LocalPosition: {x: -2.155, y: 1.303, z: 3.856}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
