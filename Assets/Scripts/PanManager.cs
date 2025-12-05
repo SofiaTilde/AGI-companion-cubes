@@ -38,6 +38,17 @@ public class PanManager : MonoBehaviour
 
             spawnedPancake.GetComponent<PancakeData>().batter_units++;
 
+            /*float fromSize = 0.0f;
+            float toSize = scales[0];
+
+            StopAllCoroutines();
+            StartCoroutine(AnimateScale(
+                spawnedPancake.transform,
+                Vector3.one * fromSize,
+                Vector3.one * toSize,
+                1f // duration in seconds
+            ));*/
+
             // particle system: splash
             ps_splash.SetActive(true);
             ps_splash.GetComponent<ParticleSystem>().Play();
@@ -58,14 +69,14 @@ public class PanManager : MonoBehaviour
                 //spawnedPancake.transform.localScale = Vector3.one * scales[size];
                 //spawnedPancake.GetComponent<PancakeData>().batter_units++;
 
-                float fromSize = scales[size - 1];
-                float toSize = scales[size];
-
                 spawnedPancake.GetComponent<PancakeData>().batter_units++;
 
                 // particle system: splash
                 ps_splash.SetActive(true);
                 ps_splash.GetComponent<ParticleSystem>().Play();
+
+                float fromSize = scales[size - 1];
+                float toSize = scales[size];
 
                 StopAllCoroutines(); 
                 StartCoroutine(AnimateScale(

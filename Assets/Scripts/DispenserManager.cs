@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class DispenserManager : MonoBehaviour
 {
@@ -9,6 +10,11 @@ public class DispenserManager : MonoBehaviour
     [SerializeField] private Image egg_filler;
     [SerializeField] private Image milk_filler;
     [SerializeField] private Image flour_filler;
+
+    // empty text
+    [SerializeField] private GameObject egg_empty;
+    [SerializeField] private GameObject milk_empty;
+    [SerializeField] private GameObject flour_empty;
 
     // current amount of ingredients
     private int current_eggs = 0;
@@ -27,6 +33,9 @@ public class DispenserManager : MonoBehaviour
         if (egg_filler != null) egg_filler.fillAmount = 0.0f;
         if (milk_filler != null) milk_filler.fillAmount = 0.0f;
         if (flour_filler != null) flour_filler.fillAmount = 0.0f;
+
+        // Start blinking of the empty text
+        StartCoroutine(TextBlink());
     }
 
     private void OnEnable()
@@ -120,7 +129,7 @@ public class DispenserManager : MonoBehaviour
         }
     }
 
-    private System.Collections.IEnumerator DispenseRoutine()
+    private IEnumerator DispenseRoutine()
     {
         while (panInside)
         {
@@ -154,5 +163,50 @@ public class DispenserManager : MonoBehaviour
             panManager.AddBatter();
         }
     }
+
+    private IEnumerator TextBlink()
+    {
+        bool prev_eggs = false;
+        bool prev_milk = false;
+        bool prev_flour = false;
+
+        while (true)
+        {
+            Debug.Log("Text Blink corroutine");
+
+            if (current_eggs<=0)
+            {
+                egg_empty.SetActive(prev_eggs);
+                prev_eggs = !prev_eggs;
+            }
+            else
+            {
+                egg_empty.SetActive(false);
+            }
+
+            if (current_milk <= 0)
+            {
+                milk_empty.SetActive(prev_milk);
+                prev_milk = !prev_milk;
+            }
+            else
+            {
+                milk_empty.SetActive(false);
+            }
+
+            if (current_flour <= 0)
+            {
+                flour_empty.SetActive(prev_flour);
+                prev_flour = !prev_flour;
+            }
+            else
+            {
+                flour_empty.SetActive(false);
+            }
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
 
 }
