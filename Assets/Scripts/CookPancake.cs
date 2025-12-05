@@ -16,7 +16,7 @@ public class CookPancake : MonoBehaviour
     private bool triggered_step2 = false;
     private bool triggered_ps_cooking = false;
 
-    private GameObject current_pancake; // TODO: EL COMPONENT PARA COOK ESTÁ EN EL PARENT DEL PANCAKE, NO EN EL COLLIDER DEL PANCAKE!
+    private PancakeData current_pancake; 
 
     private void Update()
     {
@@ -72,7 +72,7 @@ public class CookPancake : MonoBehaviour
         pancakeInside = true;
         cookTimer = 0f;
 
-        current_pancake = other.transform.gameObject;
+        current_pancake = other.transform.parent.gameObject.GetComponent<PancakeData>();
     }
 
     private void OnTriggerExit(Collider other)
