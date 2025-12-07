@@ -16,7 +16,14 @@ public class CookPancake : MonoBehaviour
     private bool triggered_step2 = false;
     private bool triggered_ps_cooking = false;
 
-    private PancakeData current_pancake; 
+    private PancakeData current_pancake;
+
+    private AudioSource audioSource;
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     private void Update()
     {
@@ -73,6 +80,8 @@ public class CookPancake : MonoBehaviour
         cookTimer = 0f;
 
         current_pancake = other.transform.parent.gameObject.GetComponent<PancakeData>();
+
+        audioSource.Play();
     }
 
     private void OnTriggerExit(Collider other)

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+
 
 public class DispenserManager : MonoBehaviour
 {
@@ -16,6 +18,9 @@ public class DispenserManager : MonoBehaviour
     [SerializeField] private GameObject milk_empty;
     [SerializeField] private GameObject flour_empty;
 
+    // audio files
+    [SerializeField] private List<AudioClip> audioFiles;
+
     // current amount of ingredients
     private int current_eggs = 0;
     private int current_milk = 0;
@@ -27,6 +32,8 @@ public class DispenserManager : MonoBehaviour
     private bool panInside = false;
     private Coroutine dispensingCoroutine;
 
+    private AudioSource audioSource;
+
     private void Start()
     {
         // Reset filler amount
@@ -36,6 +43,8 @@ public class DispenserManager : MonoBehaviour
 
         // Start blinking of the empty text
         StartCoroutine(TextBlink());
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -161,7 +170,22 @@ public class DispenserManager : MonoBehaviour
             UpdateFiller(flour_filler, current_flour);
 
             panManager.AddBatter();
+
+            // reproduce a random sound
+            PlayRandomSound();
         }
+    }
+
+    private void PlayRandomSound()
+    {
+        if (audioFiles == null || audioFiles.Count == 0)
+        {
+            Debug.LogWarning("No audio clips assigned!");
+            return;
+        }
+
+        int index = Random.Range(0, audioFiles.Count);
+        audioSource.PlayOneShot(audioFiles[index]);
     }
 
     private IEnumerator TextBlink()

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PancakeData : MonoBehaviour
 {
@@ -7,8 +8,9 @@ public class PancakeData : MonoBehaviour
     public Material pancakeCooked;
     public Material pancakeBurnt;
 
-    public int batter_units = 0; // this represents how big the pancake is. Every 2 seconds, the dispenser gives 1 unit of batter.
+    public int batter_units = 0; // 0 is small, 1 is medium, 2 is big
     public int state = 0; // 0 is raw, 1 is cooked, 2 is burnt
+    public List<string> list_toppings = new List<string>();
 
     // private data
     private Renderer pancakeRenderer;
