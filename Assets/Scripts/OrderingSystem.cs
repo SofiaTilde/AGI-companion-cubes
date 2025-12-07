@@ -158,7 +158,7 @@ public class OrderingSystem : MonoBehaviour
     public void AddOrder(string pancake_type, List<string> toppings_list)
     {
         // play sound
-        audioSource.Play();
+        audioSource.Play(); 
 
         // add pancake type to queue pancakes
         queue_pancakes.Enqueue(pancake_type);
