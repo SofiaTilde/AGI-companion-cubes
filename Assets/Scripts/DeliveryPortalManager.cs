@@ -13,12 +13,19 @@ public class DeliveryPortalManager : MonoBehaviour
     public PanManager pan_manager;
     public OrderingSystem ordering_system;
 
+    // audio files
+    [SerializeField] private List<AudioClip> audioFiles; // first one is correct delivery, second is wrong delivery
+
+    private AudioSource audioSource;
+
     private void Start()
     {
         goodExplosion = this.gameObject.transform.GetChild(1).gameObject;
         goodExplosionParticles = goodExplosion.GetComponent<ParticleSystem>();
         badExplosion = this.gameObject.transform.GetChild(0).gameObject;
         badExplosionParticles = badExplosion.GetComponent<ParticleSystem>();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -33,11 +40,13 @@ public class DeliveryPortalManager : MonoBehaviour
             {
                 goodExplosion.SetActive(true);
                 goodExplosionParticles.Play();
+                audioSource.PlayOneShot(audioFiles[0]);
             } 
             else
             {
                 badExplosion.SetActive(true);
                 badExplosionParticles.Play();
+                audioSource.PlayOneShot(audioFiles[1]);
             }
 
             // Instead of destroying here, call the pan manager to destroy
