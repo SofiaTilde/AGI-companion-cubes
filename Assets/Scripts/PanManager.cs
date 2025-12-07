@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
 
 public class PanManager : MonoBehaviour
 {
@@ -11,12 +11,22 @@ public class PanManager : MonoBehaviour
     private bool has_pancake = false;
     [System.NonSerialized] public GameObject spawnedPancake;  // runtime instance
 
-    public OrderingSystem ordering_system; 
+    public OrderingSystem ordering_system;
+
+    // audio files
+    [SerializeField] private List<AudioClip> audioFiles;// first is cooking, second is overcooked
 
     // particle system
     [SerializeField] private GameObject ps_splash;
     [SerializeField] private GameObject ps_cooking;
     [SerializeField] private GameObject ps_overcooked;
+
+    private AudioSource audioSource;
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     public void AddBatter()
     {
@@ -123,17 +133,21 @@ public class PanManager : MonoBehaviour
     {
         ps_cooking.SetActive(true);
         ps_cooking.GetComponent<ParticleSystem>().Play();
+
+        audioSource.PlayOneShot(audioFiles[0]);
     }
 
     public void Stop_PS_cooking()
     {
         ps_cooking.SetActive(false);
+        audioSource.Stop();
     }
 
     public void Trigger_PS_overcooked()
     {
         ps_overcooked.SetActive(true);
         ps_overcooked.GetComponent<ParticleSystem>().Play();
+        audioSource.PlayOneShot(audioFiles[1]);
     }
 
     private void OnTriggerEnter(Collider other)

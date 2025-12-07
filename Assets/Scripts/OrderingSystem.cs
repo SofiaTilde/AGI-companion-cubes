@@ -30,9 +30,12 @@ public class OrderingSystem : MonoBehaviour
     [Range(0, 100)]
     private int transparency = 30; // percentage of transparency
 
+    private AudioSource audioSource;
+
     private void Start()
     {
         Start_Step1();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void Start_Step1()
@@ -150,6 +153,9 @@ public class OrderingSystem : MonoBehaviour
 
     public void AddOrder(string pancake_type, List<string> toppings_list)
     {
+        // play sound
+        audioSource.Play();
+
         // add pancake type to queue pancakes
         queue_pancakes.Enqueue(pancake_type);
 
