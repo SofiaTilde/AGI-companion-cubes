@@ -1,0 +1,11 @@
+- TURN OFF FIREWALL
+
+- Connect this computer to the same WIFI as the computer with Unity.
+
+- Change IP of the computer in index.html, at the end of the document
+
+- Open Python in this folder and run: 
+python -m http.server 5500
+
+- In the phone, access: 
+http://192.168.1.117:5500/index.html

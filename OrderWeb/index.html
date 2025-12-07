@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pancake Order</title>
+<style>
+/* Reset and global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Arial', sans-serif;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #FFB347, #FFCC33);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease-in-out infinite;
+  color: white;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Background animation */
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Container for buttons */
+.button-group, .toppings {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Button styles */
+.btn {
+  background: rgba(255,255,255,0.15);
+  padding: 1rem;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.btn img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.btn span {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+}
+
+.btn.selected {
+  transform: scale(1.1);
+  border: 2px solid white;
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+/* Send order button */
+.send-btn {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  border: none;
+  background: linear-gradient(45deg, #FF7E5F, #FEB47B);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+}
+</style>
+</head>
+<body>
+
+<h1>🍽️ Pancake Order</h1>
+
+<h2 style="margin-top: 2rem;">Choose Size</h2>
+<div class="button-group">
+  <div class="btn pancake-size" data-size="small">
+    <img src="small-pancake.png" alt="Small">
+    <span>Small</span>
+  </div>
+  <div class="btn pancake-size" data-size="medium">
+    <img src="medium-pancake.png" alt="Medium">
+    <span>Medium</span>
+  </div>
+  <div class="btn pancake-size" data-size="large">
+    <img src="large-pancake.png" alt="Large">
+    <span>Large</span>
+  </div>
+</div>
+
+<h2 style="margin-top: 2rem;">Choose Topping</h2>
+
+<div class="toppings">
+  <div class="btn" data-topping="blueberry">
+    <img src="blueberry.png" alt="Blueberry">
+    <span>Blueberry</span>
+  </div>
+  <div class="btn" data-topping="chocolate">
+    <img src="chocolate.png" alt="Chocolate">
+    <span>Chocolate</span>
+  </div>
+  <div class="btn" data-topping="rose">
+    <img src="rose.png" alt="Rose">
+    <span>Rose</span>
+  </div>
+</div>
+
+<button id="send-order" class="send-btn">Send Order</button>
+
+<script>
+// Variables for user selection
+let size = '';
+let topping = '';
+
+// Handle pancake size selection
+document.querySelectorAll('.pancake-size').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pancake-size').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    size = btn.dataset.size;
+  });
+});
+
+let toppings = []; // Array of selected toppings
+
+document.querySelectorAll('.toppings .btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const value = btn.dataset.topping;
+    if (btn.classList.contains('selected')) {
+      // Deselect
+      btn.classList.remove('selected');
+      toppings = toppings.filter(t => t !== value);
+    } else {
+      // Select
+      btn.classList.add('selected');
+      toppings.push(value);
+    }
+  });
+});
+
+
+// Send order to Unity HTTP server
+document.getElementById('send-order').addEventListener('click', () => {
+  if (!size || toppings.length === 0) {
+    alert('Please select a size and at least one topping!');
+    return;
+  }
+
+  const toppingString = toppings.join(',');
+
+  fetch('http://192.168.1.117:5000/order/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({size, topping: toppingString})
+  })
+  .then(response => response.text())
+  .then(data => {
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Order Sent!';
+    toast.style.opacity = 1;
+
+    setTimeout(() => {
+      toast.style.opacity = 0;
+    }, 2000);
+  })
+  .catch(err => alert('Failed to send order: ' + err));
+});
+
+</script>
+
+</body>
+
+<div id="toast" style="
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+">
+</div>
+
+</html>

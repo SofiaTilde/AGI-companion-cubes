@@ -23,8 +23,10 @@ public class OrderingSystem : MonoBehaviour
     public Material cooked_mat;
 
     // private variables
-    private Queue<string> queue_pancakes = new Queue<string>();
-    private Queue<List<string>> queue_toppings = new Queue<List<string>>(); // this ia list of lists, like [blueberries],[blueberries, chocolate]. Each batch of toppings is one order
+    // pancakes: Big, Medium, Small
+    public Queue<string> queue_pancakes = new Queue<string>();
+    // toppings: Blueberries, Chocolate, Rose
+    public Queue<List<string>> queue_toppings = new Queue<List<string>>(); // this is list of lists, like [blueberries],[blueberries, chocolate]. Each batch of toppings is one order
     private int current_step = 0;
 
     [Range(0, 100)]
@@ -53,7 +55,7 @@ public class OrderingSystem : MonoBehaviour
         }
         else
         {
-            // there is one order waiting
+            // there is at least one order waiting
             Reset_Step2();
             current_step = 1;
             title_text.text = "Current order";
@@ -148,6 +150,8 @@ public class OrderingSystem : MonoBehaviour
 
         // then call Start_Step1()
         orders_remaining_text.text = queue_pancakes.Count.ToString() + " remaining";
+        Reset_Step1();
+        Reset_Step2();
         Start_Step1();
     }
 

@@ -196,8 +196,6 @@ public class DispenserManager : MonoBehaviour
 
         while (true)
         {
-            Debug.Log("Text Blink corroutine");
-
             if (current_eggs<=0)
             {
                 egg_empty.SetActive(prev_eggs);
