@@ -47,6 +47,17 @@ public class udp_listener : MonoBehaviour
                 {
                     nfc_sim.TriggerFlourEvent();
                 }
+                else if (message == "blueberries")
+                {
+
+                }
+                else if (message == "chocolate"){
+
+                }
+                else if(message == "rose")
+                {
+
+                }
 
             }
         }
