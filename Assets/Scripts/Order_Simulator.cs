@@ -13,7 +13,7 @@ public class Order_Simulator : MonoBehaviour
     public void TriggerBigEvent()
     {
         Debug.Log("Big pancake blueberries.");
-        ordering_system.AddOrder("Big", new List<string> { "Blueberries" });
+        ordering_system.AddOrder("Big", new List<string> { "Blueberry" });
 
         OnBigEvent?.Invoke();
     }
@@ -21,7 +21,7 @@ public class Order_Simulator : MonoBehaviour
     public void TriggerMediumEvent()
     {
         Debug.Log("Medium pancake blueberries.");
-        ordering_system.AddOrder("Medium", new List<string> { "Blueberries" });
+        ordering_system.AddOrder("Medium", new List<string> { "Blueberry" });
 
         OnMediumEvent?.Invoke();
     }
@@ -29,7 +29,7 @@ public class Order_Simulator : MonoBehaviour
     public void TriggerSmallEvent()
     {
         Debug.Log("Small pancake blueberries.");
-        ordering_system.AddOrder("Small", new List<string> { "Blueberries" });
+        ordering_system.AddOrder("Small", new List<string> { "Blueberry" });
 
         OnSmallEvent?.Invoke();
     }
