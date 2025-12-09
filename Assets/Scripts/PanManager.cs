@@ -42,22 +42,11 @@ public class PanManager : MonoBehaviour
             Vector3 spawnPos = transform.position + Vector3.up * 0.02f;
 
             spawnedPancake = Instantiate(pancake, spawnPos, Quaternion.identity);
-            spawnedPancake.transform.localScale = Vector3.one * scales[0];
-            spawnedPancake.transform.SetParent(transform); // set the pan as the parent (temporarily)
+            spawnedPancake.transform.localScale = Vector3.one * scales[0]; 
+            spawnedPancake.transform.SetParent(transform); //set the pan as the parent (temporarily)
             has_pancake = true;
 
             spawnedPancake.GetComponent<PancakeData>().batter_units++;
-
-            /*float fromSize = 0.0f;
-            float toSize = scales[0];
-
-            StopAllCoroutines();
-            StartCoroutine(AnimateScale(
-                spawnedPancake.transform,
-                Vector3.one * fromSize,
-                Vector3.one * toSize,
-                1f // duration in seconds
-            ));*/
 
             // particle system: splash
             ps_splash.SetActive(true);
@@ -75,10 +64,6 @@ public class PanManager : MonoBehaviour
 
             if (size < MAX_BATTER_UNITS)
             {
-                // set local size of the pancake to scales[batter_units]
-                //spawnedPancake.transform.localScale = Vector3.one * scales[size];
-                //spawnedPancake.GetComponent<PancakeData>().batter_units++;
-
                 spawnedPancake.GetComponent<PancakeData>().batter_units++;
 
                 // particle system: splash
@@ -125,8 +110,8 @@ public class PanManager : MonoBehaviour
         }
 
         //spawnedPancake.transform.SetParent(null);
-        //rb.useGravity = true;
-        //rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.isKinematic = false;
     }
 
     public void Trigger_PS_cooking()
