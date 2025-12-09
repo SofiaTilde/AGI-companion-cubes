@@ -21,6 +21,12 @@ public class PortalToppings : MonoBehaviour
     [Header("Pan reference")]
     public PanManager pan;
 
+    private AudioSource audioSource;
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     private void OnEnable()
     {
         // subscribe to events
@@ -76,6 +82,7 @@ public class PortalToppings : MonoBehaviour
         {
             Vector3 spawnPos = transform.position;
             Instantiate(prefabMedium, spawnPos, rot);
+            audioSource.Play();
             return;
         }
 
@@ -96,6 +103,7 @@ public class PortalToppings : MonoBehaviour
         // Spawn without parent first
         Vector3 spawnPosFinal = transform.position;
         GameObject spawned = Instantiate(prefabToSpawn, spawnPosFinal, rot);
+        audioSource.Play();
 
         // Set parent **without changing world position/scale**
         spawned.transform.SetParent(parent, worldPositionStays: true);
