@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PanManager : MonoBehaviour
 {
-    public int MAX_BATTER_UNITS = 3;       // minipancake, normal pancake, gigantic pancake.
+    public int MAX_BATTER_UNITS = 2;       // 0 minipancake, 1 normal pancake, 2 gigantic pancake.
     private float[] scales = new float[] { 0.03f, 0.06f, 0.1f }; // local scales for each type of pancake
     [SerializeField] private GameObject pancake; // this pancake is a prefab
 
@@ -70,8 +70,11 @@ public class PanManager : MonoBehaviour
                 ps_splash.SetActive(true);
                 ps_splash.GetComponent<ParticleSystem>().Play();
 
-                float fromSize = scales[size - 1];
-                float toSize = scales[size];
+                //float fromSize = scales[size - 1];
+                //float toSize = scales[size];
+
+                float fromSize = scales[size];
+                float toSize = scales[size+1];
 
                 StopAllCoroutines(); 
                 StartCoroutine(AnimateScale(

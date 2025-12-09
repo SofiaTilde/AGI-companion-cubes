@@ -40,7 +40,7 @@ public class DeliveryPortalManager : MonoBehaviour
             {
                 goodExplosion.SetActive(true);
                 goodExplosionParticles.Play();
-                audioSource.PlayOneShot(audioFiles[0]);
+                audioSource.PlayOneShot(audioFiles[0], 0.3f);
             } 
             else
             {
@@ -84,7 +84,7 @@ public class DeliveryPortalManager : MonoBehaviour
                 if(this_pancake.batter_units == order_size)
                 {
                     // check toppings
-                    bool equal_toppings = new HashSet<string>(toppings_types).SetEquals(this_pancake.list_toppings); // returns true if both sets have the same elements, order doesn’t matter.
+                    bool equal_toppings = new HashSet<string>(toppings_types).SetEquals(this_pancake.list_toppings); // returns true if both sets have the same elements, order doesnï¿½t matter.
                
                     if (equal_toppings)
                     {
