@@ -9,9 +9,13 @@ public class DispenserManager : MonoBehaviour
     [SerializeField] private PanManager panManager;
 
     // image fillers 
-    [SerializeField] private Image egg_filler;
-    [SerializeField] private Image milk_filler;
-    [SerializeField] private Image flour_filler;
+    //[SerializeField] private Image egg_filler;
+    //[SerializeField] private Image milk_filler;
+    //[SerializeField] private Image flour_filler;
+
+    [SerializeField] private GameObject egg_filler;
+    [SerializeField] private GameObject milk_filler;
+    [SerializeField] private GameObject flour_filler;
 
     // empty text
     [SerializeField] private GameObject egg_empty;
@@ -37,9 +41,9 @@ public class DispenserManager : MonoBehaviour
     private void Start()
     {
         // Reset filler amount
-        if (egg_filler != null) egg_filler.fillAmount = 0.0f;
-        if (milk_filler != null) milk_filler.fillAmount = 0.0f;
-        if (flour_filler != null) flour_filler.fillAmount = 0.0f;
+        UpdateFiller(egg_filler, current_eggs);
+        UpdateFiller(milk_filler, current_milk);
+        UpdateFiller(flour_filler, current_flour);
 
         // Start blinking of the empty text
         StartCoroutine(TextBlink());
@@ -90,12 +94,20 @@ public class DispenserManager : MonoBehaviour
         }
     }
 
-    private void UpdateFiller(Image filler, int currentValue)
+    private void UpdateFiller(GameObject filler, int currentValue)
     {
         if (filler == null) return;
 
-        filler.fillAmount = (float)currentValue / MAX_ITEMS;
+        int childCount = filler.transform.childCount;
+
+        for (int i = 0; i < childCount; i++)
+        {
+            // Child indices start at 0, but currentValue starts at 1
+            bool shouldBeActive = (i == currentValue - 1);
+            filler.transform.GetChild(i).gameObject.SetActive(shouldBeActive);
+        }
     }
+
 
     // if an object enters the box collider
     // check tag of the object. if the tag is "Pan"

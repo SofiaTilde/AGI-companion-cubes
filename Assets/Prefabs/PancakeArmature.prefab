@@ -475,6 +475,7 @@ MonoBehaviour:
   pancakeBurnt: {fileID: 2100000, guid: 7c08e7f6a5d4b6d4bbd9f18490767e34, type: 2}
   batter_units: 0
   state: 0
+  list_toppings: []
 --- !u!1 &2516124189497829413
 GameObject:
   m_ObjectHideFlags: 0
