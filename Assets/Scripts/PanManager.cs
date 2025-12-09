@@ -46,7 +46,7 @@ public class PanManager : MonoBehaviour
             spawnedPancake.transform.SetParent(transform); //set the pan as the parent (temporarily)
             has_pancake = true;
 
-            spawnedPancake.GetComponent<PancakeData>().batter_units++;
+            //spawnedPancake.GetComponent<PancakeData>().batter_units++;
 
             // particle system: splash
             ps_splash.SetActive(true);
@@ -95,7 +95,7 @@ public class PanManager : MonoBehaviour
         }
             
         // the rigid body is in the second child
-        Transform rbHolder = spawnedPancake.transform.GetChild(1);
+        Transform rbHolder = spawnedPancake.transform.GetChild(0);
         if (rbHolder == null)
         {
             Debug.Log("PanManager: Pancake does not have second child");
@@ -109,7 +109,7 @@ public class PanManager : MonoBehaviour
             return;
         }
 
-        //spawnedPancake.transform.SetParent(null);
+        spawnedPancake.transform.SetParent(null);
         rb.useGravity = true;
         rb.isKinematic = false;
     }

@@ -177,7 +177,7 @@ document.getElementById('send-order').addEventListener('click', () => {
 
   const toppingString = toppings.join(',');
 
-  fetch('http://192.168.1.117:5000/order/', {
+  fetch('http://10.90.122.241:5000/order/', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({size, topping: toppingString})

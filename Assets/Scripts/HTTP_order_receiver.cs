@@ -43,7 +43,7 @@ public class HTTP_order_receiver : MonoBehaviour
         }
     }
 
-    void HandleRequests()
+    /*void HandleRequests()
     {
         while (true)
         {
@@ -76,7 +76,44 @@ public class HTTP_order_receiver : MonoBehaviour
                 context.Response.Close();
             }
         }
+    }*/
+
+    void HandleRequests()
+    {
+        while (true)
+        {
+            var context = listener.GetContext();
+            var request = context.Request;
+
+            // ALWAYS add CORS headers first
+            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+            context.Response.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+            context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+
+            // CORS preflight
+            if (request.HttpMethod == "OPTIONS")
+            {
+                context.Response.StatusCode = 200;
+                context.Response.Close();
+                continue;
+            }
+
+            if (request.HttpMethod == "POST")
+            {
+                using var reader = new StreamReader(request.InputStream);
+                string body = reader.ReadToEnd();
+
+                Debug.Log("Received HTTP order: " + body);
+
+                ParseOrder(body);
+
+                byte[] responseBytes = Encoding.UTF8.GetBytes("OK");
+                context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
+                context.Response.Close();
+            }
+        }
     }
+
 
     void OnApplicationQuit()
     {

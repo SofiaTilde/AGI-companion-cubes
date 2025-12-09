@@ -25,7 +25,7 @@ public class OrderingSystem : MonoBehaviour
     // private variables
     // pancakes: Big, Medium, Small
     public Queue<string> queue_pancakes = new Queue<string>();
-    // toppings: Blueberries, Chocolate, Rose
+    // toppings: Blueberry, Chocolate, Rose
     public Queue<List<string>> queue_toppings = new Queue<List<string>>(); // this is list of lists, like [blueberries],[blueberries, chocolate]. Each batch of toppings is one order
     private int current_step = 0;
 
