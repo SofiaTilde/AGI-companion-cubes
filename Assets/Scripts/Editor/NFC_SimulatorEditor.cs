@@ -26,5 +26,21 @@ public class NFC_SimulatorEditor : Editor
         {
             sim.TriggerFlourEvent();
         }
+
+        // toppings
+        if (GUILayout.Button("Trigger Blueberry Event"))
+        {
+            sim.TriggerBlueberryEvent();
+        }
+
+        if (GUILayout.Button("Trigger Chocolate Event"))
+        {
+            sim.TriggerChocolateEvent();
+        }
+
+        if (GUILayout.Button("Trigger Rose Event"))
+        {
+            sim.TriggerRoseEvent();
+        }
     }
 }

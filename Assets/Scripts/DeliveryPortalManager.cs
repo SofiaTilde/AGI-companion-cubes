@@ -62,11 +62,17 @@ public class DeliveryPortalManager : MonoBehaviour
         {
             Debug.Log("Pancake is cooked");
 
-            // check current order: 
-            string pancake_type = ordering_system.queue_pancakes.Peek();
-            List<string> toppings_types = ordering_system.queue_toppings.Peek();
+            // check current order:
+            string pancake_type = "hola";
+            List<string> toppings_types = null;
 
-            if (pancake_type != null && toppings_types != null)
+            if (ordering_system.queue_pancakes.Count > 0)
+            {
+                pancake_type = ordering_system.queue_pancakes.Peek();
+                toppings_types = ordering_system.queue_toppings.Peek();
+            }
+
+            if (pancake_type != "hola" && toppings_types != null)
             {
                 // check size of the pancake
                 int order_size = 0;
