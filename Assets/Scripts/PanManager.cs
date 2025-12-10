@@ -9,7 +9,7 @@ public class PanManager : MonoBehaviour
     [SerializeField] private GameObject pancake; // this pancake is a prefab
 
     private bool has_pancake = false;
-    [System.NonSerialized] public GameObject spawnedPancake;  // runtime instance
+    public GameObject spawnedPancake;  // runtime instance
 
     public OrderingSystem ordering_system;
 
@@ -22,6 +22,9 @@ public class PanManager : MonoBehaviour
     [SerializeField] private GameObject ps_overcooked;
 
     private AudioSource audioSource;
+    private int number_pancakes = 0;
+
+    public bool pan_in_fire = false;
 
     private void Start()
     {
@@ -42,6 +45,8 @@ public class PanManager : MonoBehaviour
             Vector3 spawnPos = transform.position + Vector3.up * 0.02f;
 
             spawnedPancake = Instantiate(pancake, spawnPos, Quaternion.identity);
+            spawnedPancake.gameObject.name = "Pancake_" + number_pancakes.ToString();
+            number_pancakes++;
             spawnedPancake.transform.localScale = Vector3.one * scales[0]; 
             spawnedPancake.transform.SetParent(transform); //set the pan as the parent (temporarily)
             has_pancake = true;
@@ -119,10 +124,14 @@ public class PanManager : MonoBehaviour
 
     public void Trigger_PS_cooking()
     {
-        ps_cooking.SetActive(true);
-        ps_cooking.GetComponent<ParticleSystem>().Play();
+        if(pan_in_fire)
+        {
+            ps_cooking.SetActive(true);
+            ps_cooking.GetComponent<ParticleSystem>().Play();
 
-        audioSource.PlayOneShot(audioFiles[0]);
+            audioSource.PlayOneShot(audioFiles[0]);
+        }
+        
     }
 
     public void Stop_PS_cooking()
@@ -133,23 +142,36 @@ public class PanManager : MonoBehaviour
 
     public void Trigger_PS_overcooked()
     {
-        ps_overcooked.SetActive(true);
-        ps_overcooked.GetComponent<ParticleSystem>().Play();
-        audioSource.PlayOneShot(audioFiles[1]);
+        if (pan_in_fire)
+        {
+            ps_overcooked.SetActive(true);
+            ps_overcooked.GetComponent<ParticleSystem>().Play();
+            audioSource.PlayOneShot(audioFiles[1]);
+        }
+        
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Pancake"))
         {
-            has_pancake = true;
-            spawnedPancake = other.transform.parent.gameObject;
-            Debug.Log("has pancake = TRUE");
+            if (!has_pancake)
+            {
+                has_pancake = true;
+                spawnedPancake = other.transform.parent.gameObject;
+                Debug.Log("has pancake = TRUE");
+            }
+            
         }
         else if (other.CompareTag("Deleter"))
         {
             DestroyPancake(other);
         }
+        else if (other.CompareTag("Fire"))
+        {
+            pan_in_fire = true;
+        }
+
     }
 
     public void DestroyPancake(Collider other)
@@ -179,9 +201,24 @@ public class PanManager : MonoBehaviour
     {
         if (other.CompareTag("Pancake"))
         {
-            has_pancake = false;
-            spawnedPancake = null;
-            Debug.Log("has pancake = FALSE");
+            string current_name = "hola";
+
+            if (spawnedPancake != null)
+                current_name = spawnedPancake.gameObject.name;
+            string other_name = other.transform.parent.gameObject.name;
+
+            if (current_name == other_name)
+            {
+                has_pancake = false;
+                spawnedPancake = null;
+                Debug.Log("has pancake = FALSE");
+            }
+            
+        }
+        else if (other.CompareTag("Fire"))
+        {
+            pan_in_fire = false;
+            Stop_PS_cooking();
         }
     }
 

@@ -9,6 +9,7 @@ TagManager:
   - Pancake
   - Wall
   - Deleter
+  - Fire
   layers:
   - Default
   - TransparentFX

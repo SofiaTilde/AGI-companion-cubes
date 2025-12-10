@@ -26,6 +26,16 @@ public class Order_SimulatorEditor : Editor
         {
             sim.TriggerSmallEvent();
         }
+
+        if (GUILayout.Button("Order Small Pancake Chocolate"))
+        {
+            sim.TriggerSmallChocolateEvent();
+        }
+
+        if (GUILayout.Button("Order Small All toppings"))
+        {
+            sim.TriggerSmallAllEvent();
+        }
     }
 }
 
