@@ -49,14 +49,15 @@ public class udp_listener : MonoBehaviour
                 }
                 else if (message == "blueberries")
                 {
-
+                    nfc_sim.TriggerBlueberryEvent();
                 }
-                else if (message == "chocolate"){
-
+                else if (message == "chocolate")
+                {
+                    nfc_sim.TriggerChocolateEvent();
                 }
                 else if(message == "rose")
                 {
-
+                    nfc_sim.TriggerRoseEvent();
                 }
 
             }

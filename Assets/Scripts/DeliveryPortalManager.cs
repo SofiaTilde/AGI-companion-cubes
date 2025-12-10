@@ -32,6 +32,8 @@ public class DeliveryPortalManager : MonoBehaviour
     {
         if (other.CompareTag("Pancake")) {
 
+            Debug.Log("Called deliver pancake");
+
             // check if delivery is correct
             PancakeData this_pancake = other.transform.parent.gameObject.GetComponent<PancakeData>();
             bool isCorrect = CheckOrder(this_pancake);
@@ -51,6 +53,10 @@ public class DeliveryPortalManager : MonoBehaviour
 
             // Instead of destroying here, call the pan manager to destroy
             pan_manager.DestroyPancake(other); // this function also resets the order to the next one
+            if (other != null)
+            {
+                Destroy(other.transform.parent.gameObject);
+            }
         }
     }
 
@@ -83,9 +89,12 @@ public class DeliveryPortalManager : MonoBehaviour
 
                 if(this_pancake.batter_units == order_size)
                 {
+
                     // check toppings
                     bool equal_toppings = new HashSet<string>(toppings_types).SetEquals(this_pancake.list_toppings); // returns true if both sets have the same elements, order doesn�t matter.
-               
+                    Debug.Log("Ordered toppings: " + string.Join(", ", toppings_types));
+                    Debug.Log("Pancake toppings: " + string.Join(", ", this_pancake.list_toppings));
+
                     if (equal_toppings)
                     {
                         isCorrect = true;

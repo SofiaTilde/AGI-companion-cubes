@@ -8,6 +8,9 @@ public class Order_Simulator : MonoBehaviour
     public static event Action OnMediumEvent;
     public static event Action OnSmallEvent;
 
+    public static event Action OnSmallChocolateEvent;
+    public static event Action OnSmallAllEvent;
+
     public OrderingSystem ordering_system;
 
     public void TriggerBigEvent()
@@ -32,5 +35,21 @@ public class Order_Simulator : MonoBehaviour
         ordering_system.AddOrder("Small", new List<string> { "Blueberry" });
 
         OnSmallEvent?.Invoke();
+    }
+
+    public void TriggerSmallChocolateEvent()
+    {
+        Debug.Log("Small pancake chocolate.");
+        ordering_system.AddOrder("Small", new List<string> { "Chocolate" });
+
+        OnSmallChocolateEvent?.Invoke();
+    }
+
+    public void TriggerSmallAllEvent()
+    {
+        Debug.Log("Small pancake All.");
+        ordering_system.AddOrder("Small", new List<string> { "Blueberry", "Chocolate", "Rose" });
+
+        OnSmallAllEvent?.Invoke();
     }
 }
