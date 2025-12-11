@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(Renderer))]
 public class PancakeData : MonoBehaviour
 {
     [Header("Pancake Materials")]
@@ -17,11 +18,9 @@ public class PancakeData : MonoBehaviour
 
     private void Start()
     {
-        // the renderer is in the first child of the pancake"
-        Transform firstChild = this.transform.GetChild(0);
-
-        pancakeRenderer = firstChild.GetComponent<Renderer>();
-        pancakeRenderer.material = pancakeRaw;
+        // for chimera pancake, the renderer is on the game object itself
+        pancakeRenderer = GetComponent<Renderer>();
+        //pancakeRenderer.material = pancakeRaw;
     }
 
 

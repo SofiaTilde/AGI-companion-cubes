@@ -146,7 +146,8 @@ public class DispenserManager : MonoBehaviour
             StopCoroutine(dispensingCoroutine);
             dispensingCoroutine = null;
 
-            panManager.ReleasePancake();
+            //panManager.ReleasePancake();
+            // we don't release the pancake in chimera plugin case.
         }
     }
 

@@ -35,9 +35,10 @@ public class DeliveryPortalManager : MonoBehaviour
             Debug.Log("Called deliver pancake");
 
             // check if delivery is correct
-            PancakeData this_pancake = other.transform.parent.gameObject.GetComponent<PancakeData>();
+            PancakeData this_pancake = other.gameObject.GetComponent<PancakeData>();
             bool isCorrect = CheckOrder(this_pancake);
            
+            // explosion particles
             if (isCorrect)
             {
                 goodExplosion.SetActive(true);
@@ -55,7 +56,7 @@ public class DeliveryPortalManager : MonoBehaviour
             pan_manager.DestroyPancake(other); // this function also resets the order to the next one
             if (other != null)
             {
-                Destroy(other.transform.parent.gameObject);
+                Destroy(other.gameObject);
             }
         }
     }

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// this behavior is built into ChimeraPancake.
 public class PancakeCollision : MonoBehaviour
 {
     private Rigidbody rb;

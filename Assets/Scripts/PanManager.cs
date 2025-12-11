@@ -26,6 +26,8 @@ public class PanManager : MonoBehaviour
 
     public bool pan_in_fire = false;
 
+    public ChimeraPlugin chimeraManager = null;
+
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -33,21 +35,27 @@ public class PanManager : MonoBehaviour
 
     public void AddBatter()
     {
+        if (chimeraManager == null)
+        {
+            Debug.LogWarning("Chimera Manager no properly set.");
+            return;
+        }
         if (!has_pancake)
         {
-            if (pancake == null)
-            {
-                Debug.LogWarning("PanManager: No pancake prefab assigned.");
-                return;
-            }
+            //if (pancake == null)
+            //{
+            //    Debug.LogWarning("PanManager: No pancake prefab assigned.");
+            //    return;
+            //}
 
             // it is spawned a bit above the pan world position
             Vector3 spawnPos = transform.position + Vector3.up * 0.02f;
 
-            spawnedPancake = Instantiate(pancake, spawnPos, Quaternion.identity);
+            chimeraManager.CreatePancakeAt(spawnPos, scales[0] * 0.1f);
+            //spawnedPancake = Instantiate(pancake, spawnPos, Quaternion.identity);
             spawnedPancake.gameObject.name = "Pancake_" + number_pancakes.ToString();
             number_pancakes++;
-            spawnedPancake.transform.localScale = Vector3.one * scales[0]; 
+            //spawnedPancake.transform.localScale = Vector3.one * scales[0]; 
             spawnedPancake.transform.SetParent(transform); //set the pan as the parent (temporarily)
             has_pancake = true;
 
@@ -69,7 +77,9 @@ public class PanManager : MonoBehaviour
 
             if (size < MAX_BATTER_UNITS)
             {
-                spawnedPancake.GetComponent<PancakeData>().batter_units++;
+                var pancakeData = spawnedPancake.GetComponent<PancakeData>();
+                // increase batter units when isn't the max.
+                pancakeData.batter_units++;
 
                 // particle system: splash
                 ps_splash.SetActive(true);
@@ -78,21 +88,35 @@ public class PanManager : MonoBehaviour
                 //float fromSize = scales[size - 1];
                 //float toSize = scales[size];
 
-                float fromSize = scales[size];
-                float toSize = scales[size+1];
+                //float fromSize = scales[size];
+                //float toSize = scales[size+1];
 
-                StopAllCoroutines(); 
-                StartCoroutine(AnimateScale(
-                    spawnedPancake.transform,
-                    Vector3.one * fromSize,
-                    Vector3.one * toSize,
-                    1f // duration in seconds
-                ));
+                //StopAllCoroutines(); 
+                //StartCoroutine(AnimateScale(
+                //    spawnedPancake.transform,
+                //    Vector3.one * fromSize,
+                //    Vector3.one * toSize,
+                //    1f // duration in seconds
+                //));
+
+                // for chimera pancake, no more animation here (NEED CONFIRMATION?).
+                // just recreate a new pancake.
+                var newBatterUnit = pancakeData.batter_units;
+                spawnedPancake.GetComponent<ChimeraPancake>().DestroyPancake();
+
+                // FIXME(Hengyi): refetch the position of the pan, but can be previous center of pancake.
+                var position = transform.position;
+                var previousPancakeName = spawnedPancake.name;
+                spawnedPancake = chimeraManager.CreatePancakeAt(position, scales[newBatterUnit]);
+                spawnedPancake.name = previousPancakeName;
+                spawnedPancake.GetComponent<PancakeData>().batter_units = newBatterUnit;
+
+                // FIXME(Hengyi): particle effects here?
             }
-
         }
     }
 
+    // Hengyi: we dont need this anymore.
     public void ReleasePancake()
     {
         // disable kinematic behaviour
@@ -101,7 +125,7 @@ public class PanManager : MonoBehaviour
             Debug.Log("PanManager: Pancake is null");
             return;
         }
-            
+
         // the rigid body is in the second child
         Transform rbHolder = spawnedPancake.transform.GetChild(0);
         if (rbHolder == null)
@@ -109,7 +133,7 @@ public class PanManager : MonoBehaviour
             Debug.Log("PanManager: Pancake does not have second child");
             return;
         }
-            
+
         Rigidbody rb = rbHolder.GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -124,14 +148,14 @@ public class PanManager : MonoBehaviour
 
     public void Trigger_PS_cooking()
     {
-        if(pan_in_fire)
+        if (pan_in_fire)
         {
             ps_cooking.SetActive(true);
             ps_cooking.GetComponent<ParticleSystem>().Play();
 
             audioSource.PlayOneShot(audioFiles[0]);
         }
-        
+
     }
 
     public void Stop_PS_cooking()
@@ -148,7 +172,7 @@ public class PanManager : MonoBehaviour
             ps_overcooked.GetComponent<ParticleSystem>().Play();
             audioSource.PlayOneShot(audioFiles[1]);
         }
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -158,10 +182,10 @@ public class PanManager : MonoBehaviour
             if (!has_pancake)
             {
                 has_pancake = true;
-                spawnedPancake = other.transform.parent.gameObject;
+                spawnedPancake = other.gameObject;
                 Debug.Log("has pancake = TRUE");
             }
-            
+
         }
         else if (other.CompareTag("Deleter"))
         {
@@ -176,20 +200,24 @@ public class PanManager : MonoBehaviour
 
     public void DestroyPancake(Collider other)
     {
-        if (spawnedPancake != null)
-        {
-            if (spawnedPancake != null)
-            {
-                Destroy(spawnedPancake);
-            }
-            if (other != null)
-            {
-                Destroy(other.transform.parent.gameObject);
-            }
-        }
-        else
+        if (spawnedPancake == null && other == null)
         {
             Debug.Log("Pancake is null");
+        }
+        
+        if (spawnedPancake != null)
+        {
+            spawnedPancake.GetComponent<ChimeraPancake>().DestroyPancake();
+            //Destroy(spawnedPancake);
+        }
+        if (other != null)
+        {
+            // this branch is called from DeliveryPortalManager.onTriggerEnter
+            if (other.gameObject.TryGetComponent<ChimeraPancake>(out var chimeraPancake))
+            {
+                chimeraPancake.DestroyPancake();
+            }
+            //Destroy(other.transform.parent.gameObject);
         }
 
         has_pancake = false;
@@ -201,22 +229,28 @@ public class PanManager : MonoBehaviour
     {
         if (other.CompareTag("Pancake"))
         {
-            string current_name = "hola";
+            // when a pancake leave the pan.
+            // this happens when a user DROPS a pancake.
+            string current_name = null;
 
             if (spawnedPancake != null)
-                current_name = spawnedPancake.gameObject.name;
-            string other_name = other.transform.parent.gameObject.name;
+                current_name = spawnedPancake.name;
+
+            string other_name = other.gameObject.name;
 
             if (current_name == other_name)
             {
+                // no pancake in the pan
                 has_pancake = false;
+                // remove the latest spawned pancake reference.
                 spawnedPancake = null;
                 Debug.Log("has pancake = FALSE");
             }
-            
+
         }
         else if (other.CompareTag("Fire"))
         {
+            // pan leaves fire.
             pan_in_fire = false;
             Stop_PS_cooking();
         }

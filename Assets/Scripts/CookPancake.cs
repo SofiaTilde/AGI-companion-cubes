@@ -79,7 +79,7 @@ public class CookPancake : MonoBehaviour
         pancakeInside = true;
         cookTimer = 0f;
 
-        current_pancake = other.transform.parent.gameObject.GetComponent<PancakeData>();
+        current_pancake = other.gameObject.GetComponent<PancakeData>();
 
         audioSource.Play();
     }

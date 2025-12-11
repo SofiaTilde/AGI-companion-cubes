@@ -2,14 +2,21 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.XR.CoreUtils;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct MeshDimension
 {
     public uint numVerts;
     public uint numIndices;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct BoundingBox
+{
+    public Vector3 position;
+    public Vector3 size;
 }
 
 public class ChimeraPlugin : MonoBehaviour
@@ -44,11 +51,20 @@ public class ChimeraPlugin : MonoBehaviour
     private static extern void GetPancakeMeshDimension(long handler, ref MeshDimension dim);
     [DllImport("main")]
     private static extern unsafe void GetPancakeMesh(long handler, void* vertices, void* indices);
+    [DllImport("main")]
+    private static extern uint NbEnvironmentColliders();
+    [DllImport("main")]
+    private static extern void FetchEnvironmentCollider(uint index, ref BoundingBox aabb);
+    [DllImport("main")]
+    private static extern void SetStaticBox(BoundingBox box);
 
     public GameObject DebugCube = null;
     public uint substep = 2;
     public GameObject PanController;
-    public Material DebugPancakeMaterial = null;
+    public Material RawPancakeMaterial = null;
+    public Material CookedPancakeMaterial = null;
+    public Material BurntPancakeMaterial = null;
+    public GameObject RoomRoot = null;
 
     private bool isGenesis = false;
 
@@ -56,22 +72,35 @@ public class ChimeraPlugin : MonoBehaviour
     void Start()
     {
         InitPhysics();
+        if (RoomRoot)
+        {
+            // transfer the entire room's box collider into PhysX world as PxRigidStatic.
+            SetEnvironmentIntoPhysX();
+        }
         isGenesis = true;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Get Controller transform and set PhysX rigid body accordingly.
         ProcessControllerTransform();
+        // Drive the PhysX world.
         StepPhysics(substep);
+
         if (DebugCube != null)
         {
+            // for debugging, the collider of the pan.
             TransformDebugCube();
         }
     }
 
     private void ProcessControllerTransform()
     {
+        if (!isGenesis)
+        {
+            return;
+        }
         if (PanController == null)
         {
             return;
@@ -82,6 +111,10 @@ public class ChimeraPlugin : MonoBehaviour
 
     private void TransformDebugCube()
     {
+        if (!isGenesis)
+        {
+            return;
+        }
         if (DebugCube == null)
         {
             return;
@@ -114,7 +147,8 @@ public class ChimeraPlugin : MonoBehaviour
             return null;
         }
         var handle = CreatePancakeDeformable(position, size);
-        var pancake = new GameObject($"pancake{handle}", typeof(MeshFilter), typeof(MeshRenderer), typeof(ChimeraPancake));
+        var pancake = new GameObject($"pancake{handle}", typeof(MeshFilter), typeof(MeshRenderer), typeof(ChimeraPancake), typeof(PancakeData), typeof(BoxCollider));
+        gameObject.tag = "Pancake";
         var pancakeComp = pancake.GetComponent<ChimeraPancake>();
         pancakeComp.manager = this;
         pancakeComp.PhysXPancakeHandler = handle;
@@ -124,15 +158,25 @@ public class ChimeraPlugin : MonoBehaviour
         Debug.Log($"pancake {handle} verts {dim.numVerts} and indices {dim.numIndices}");
         pancakeComp.NumVerts = dim.numVerts;
         pancakeComp.NumIndices = dim.numIndices;
+        pancakeComp.EnableMeshUpdate = true;
 
-        // FIXME: pancake currently mount on chimera manager.
+        // pancake mounts on chimera manager initially.
         pancake.transform.parent = transform;
-        // TODO: pass material for pancakes.
-
-        if (DebugPancakeMaterial != null)
+        // pass material for pancakes.
+        if (RawPancakeMaterial && CookedPancakeMaterial && BurntPancakeMaterial)
         {
-            pancake.GetComponent<MeshRenderer>().material = DebugPancakeMaterial;
+            // the pancake should be spawned with a raw material
+            var pancakeRender = pancake.GetComponent<MeshRenderer>();
+            pancakeRender.material = RawPancakeMaterial;
+            var pancakeData = pancake.GetComponent<PancakeData>();
+            pancakeData.pancakeRaw = RawPancakeMaterial;
+            pancakeData.pancakeCooked = CookedPancakeMaterial;
+            pancakeData.pancakeBurnt = BurntPancakeMaterial;
         }
+
+        // box collider, for trigging event with multiple manager.
+        var pancakeTriggerCollider = pancake.GetComponent<BoxCollider>();
+        pancakeTriggerCollider.isTrigger = true;
 
         return pancake;
     }
@@ -172,6 +216,45 @@ public class ChimeraPlugin : MonoBehaviour
             var verticesPtr = NativeArrayUnsafeUtility.GetUnsafePtr(verts);
             var indicesPtr = NativeArrayUnsafeUtility.GetUnsafePtr(indices);
             GetPancakeMesh(handler, verticesPtr, indicesPtr);
+        }
+    }
+
+    private void SetEnvironmentIntoPhysX()
+    {
+        if (!isGenesis)
+        {
+            return;
+        }
+        var colliders = RoomRoot.GetComponents<BoxCollider>();
+        foreach (var c in colliders)
+        {
+            if (c.isTrigger)
+            {
+                // skip trigger only colliders.
+                continue;
+            }
+            var box = new BoundingBox
+            {
+                position = c.center,
+                size = c.size,
+            };
+            SetStaticBox(box);
+        }
+    }
+
+    public void OnDrawGizmosSelected()
+    {
+        if (!isGenesis)
+        {
+            return;
+        }
+        var numEnvironmentObjs = NbEnvironmentColliders();
+        for (uint i = 0; i < numEnvironmentObjs; i++)
+        {
+            BoundingBox box = new();
+            FetchEnvironmentCollider(i, ref box);
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireCube(box.position, box.size);
         }
     }
 
