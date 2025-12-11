@@ -1,113 +1,183 @@
 using System;
 using System.Runtime.InteropServices;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+[StructLayout(LayoutKind.Sequential)]
+public struct MeshDimension
+{
+    public uint numVerts;
+    public uint numIndices;
+}
+
 public class ChimeraPlugin : MonoBehaviour
 {
     [DllImport("main")]
-    public static extern void InitPhysics();
+    private static extern void InitPhysics();
+    [DllImport("main")]
+    private static extern void StepPhysics(uint substep);
 
     [DllImport("main")]
-    public static extern void CleanUpPhysics();
+    private static extern void CleanUpPhysics();
 
     [DllImport("main")]
-    public static extern uint NbVerticesOfDeformable();
+    private static extern uint NbVerticesOfDeformable();
     [DllImport("main")]
-    public static extern uint NbIndicesOfDeformable();
-    [DllImport("main")]
-    public static extern uint DeformableSize();
+    private static extern uint NbIndicesOfDeformable();
 
     [DllImport("main")]
-    public unsafe static extern void StepAndGetUpdatesMesh(void* vertices, void* indices);
+    private unsafe static extern void StepAndGetUpdatesMesh(void* vertices, void* indices);
 
     [DllImport("main")]
-    public static extern uint NbVerticesOfPanCollider();
+    private static extern void FetchPanCollider(IntPtr halfExtents, IntPtr globalPose);
 
     [DllImport("main")]
-    public static extern uint NbIndicesOfPanCollider();
+    private static extern void SetPanColliderTransform(Vector3 pos, Quaternion rot);
 
     [DllImport("main")]
-    public static extern void SetPanGeometry(IntPtr vertices, IntPtr indices, uint numVertices, uint numIndices);
+    private static extern long CreatePancakeDeformable(Vector3 pos, float radius);
+    [DllImport("main")]
+    private static extern void DestroyPancakeDeformable(long handler);
+    [DllImport("main")]
+    private static extern void GetPancakeMeshDimension(long handler, ref MeshDimension dim);
+    [DllImport("main")]
+    private static extern unsafe void GetPancakeMesh(long handler, void* vertices, void* indices);
 
-    private GameObject deformable;
+    public GameObject DebugCube = null;
+    public uint substep = 2;
+    public GameObject PanController;
+    public Material DebugPancakeMaterial = null;
 
-    public Mesh PanColliderMesh;
+    private bool isGenesis = false;
 
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        SetPanColliderInPlugin();
         InitPhysics();
-        _verticesNum = (int)NbVerticesOfDeformable();
-        _indicesNum = (int)NbIndicesOfDeformable();
-        Debug.Log($"v {_verticesNum} i {_indicesNum}");
-        Debug.Log($"panv {NbVerticesOfPanCollider()} pani {NbIndicesOfPanCollider()}");
-        deformable = transform.Find("Deformable").gameObject;
-        if (deformable == null )
-        {
-            Debug.LogError("can't find a child called deformable");
-        }
+        isGenesis = true;
     }
-    private int _verticesNum = 0;
-    private int _indicesNum = 0;
 
     // Update is called once per frame
     void Update()
     {
-        //StepAndFetchMesh();
+        ProcessControllerTransform();
+        StepPhysics(substep);
+        if (DebugCube != null)
+        {
+            TransformDebugCube();
+        }
+    }
+
+    private void ProcessControllerTransform()
+    {
+        if (PanController == null)
+        {
+            return;
+        }
+        PanController.transform.GetPositionAndRotation(out var position, out var rotation);
+        SetPanColliderTransform(position, rotation);
+    }
+
+    private void TransformDebugCube()
+    {
+        if (DebugCube == null)
+        {
+            return;
+        }
+
+        var halfExtents = new float[3];
+        var transform = new float[7];
+        var gcHalfExtents = GCHandle.Alloc(halfExtents, GCHandleType.Pinned);
+        var gcTransform = GCHandle.Alloc(transform, GCHandleType.Pinned);
+
+        FetchPanCollider(gcHalfExtents.AddrOfPinnedObject(), gcTransform.AddrOfPinnedObject());
+
+        gcHalfExtents.Free();
+        gcTransform.Free();
+
+        var scale = new Vector3(halfExtents[0], halfExtents[1], halfExtents[2]);
+        scale.Scale(new Vector3(2.0f, 2.0f, 2.0f));
+        var pos = new Vector3(transform[4], transform[5], transform[6]);
+        var rot = new Quaternion(transform[0], transform[1], transform[2], transform[3]);
+
+        DebugCube.transform.localScale = scale;
+        DebugCube.transform.position = pos;
+        DebugCube.transform.rotation = rot;
+    }
+
+    public GameObject CreatePancakeAt(Vector3 position, float size)
+    {
+        if (!isGenesis)
+        {
+            return null;
+        }
+        var handle = CreatePancakeDeformable(position, size);
+        var pancake = new GameObject($"pancake{handle}", typeof(MeshFilter), typeof(MeshRenderer), typeof(ChimeraPancake));
+        var pancakeComp = pancake.GetComponent<ChimeraPancake>();
+        pancakeComp.manager = this;
+        pancakeComp.PhysXPancakeHandler = handle;
+
+        MeshDimension dim = new();
+        GetPancakeMeshDimension(handle, ref dim);
+        Debug.Log($"pancake {handle} verts {dim.numVerts} and indices {dim.numIndices}");
+        pancakeComp.NumVerts = dim.numVerts;
+        pancakeComp.NumIndices = dim.numIndices;
+
+        // FIXME: pancake currently mount on chimera manager.
+        pancake.transform.parent = transform;
+        // TODO: pass material for pancakes.
+
+        if (DebugPancakeMaterial != null)
+        {
+            pancake.GetComponent<MeshRenderer>().material = DebugPancakeMaterial;
+        }
+
+        return pancake;
+    }
+
+    public GameObject CreatePancakeAt()
+    {
+        if (PanController == null)
+        {
+            return null;
+        }
+
+        PanController.transform.GetPositionAndRotation(out var position, out var _);
+        return CreatePancakeAt(position + new Vector3(0.0f, 0.05f, 0.0f), 0.05f);
+    }
+
+    public void DestroyPhysXPancakeByHandler(long handler)
+    {
+        if (!isGenesis)
+        {
+            return;
+        }
+        if (handler < 0)
+        {
+            return;
+        }
+        DestroyPancakeDeformable(handler);
+    }
+
+    public void FetchPancakeMesh(long handler, ref NativeArray<Vector3> verts, ref NativeArray<uint> indices)
+    {
+        if (!isGenesis)
+        {
+            return;
+        }
+        unsafe
+        {
+            var verticesPtr = NativeArrayUnsafeUtility.GetUnsafePtr(verts);
+            var indicesPtr = NativeArrayUnsafeUtility.GetUnsafePtr(indices);
+            GetPancakeMesh(handler, verticesPtr, indicesPtr);
+        }
     }
 
     private void OnDestroy()
     {
         CleanUpPhysics();
-    }
-
-    private void StepAndFetchMesh()
-    {
-        var dataArray = Mesh.AllocateWritableMeshData(1);
-        var data = dataArray[0];
-
-        data.SetVertexBufferParams(
-            (int)_verticesNum,
-            new VertexAttributeDescriptor(VertexAttribute.Position)
-        );
-
-        var verticesArr = data.GetVertexData<Vector3>();
-
-        data.SetIndexBufferParams((int)_indicesNum, IndexFormat.UInt32);
-        var indicesArr = data.GetIndexData<uint>();
-
-        unsafe
-        {
-            var verticesPtr = NativeArrayUnsafeUtility.GetUnsafePtr(verticesArr);
-            var indicesPtr = NativeArrayUnsafeUtility.GetUnsafePtr(indicesArr);
-            ChimeraPlugin.StepAndGetUpdatesMesh(verticesPtr, indicesPtr);
-        }
-
-        data.subMeshCount = 1;
-        data.SetSubMesh(0, new SubMeshDescriptor(0, _indicesNum));
-
-        var mesh = new Mesh();
-        mesh.name = "Pancake Tet Soup";
-        Mesh.ApplyAndDisposeWritableMeshData(dataArray, mesh);
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-
-        deformable.GetComponent<MeshFilter>().mesh = mesh;
-    }
-
-    private void SetPanColliderInPlugin()
-    {
-        var vertices = PanColliderMesh.vertices;
-        var triangles = PanColliderMesh.triangles;
-
-        var gcVertices = GCHandle.Alloc(vertices, GCHandleType.Pinned);
-        var gcTriangles = GCHandle.Alloc(triangles, GCHandleType.Pinned);
-
-        SetPanGeometry(gcVertices.AddrOfPinnedObject(), gcTriangles.AddrOfPinnedObject(), (uint)vertices.Length, (uint)triangles.Length);
-
-        gcVertices.Free();
-        gcTriangles.Free();
+        isGenesis = false;
     }
 }
