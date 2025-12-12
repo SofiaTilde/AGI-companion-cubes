@@ -27,5 +27,15 @@ public class ChimeraEditor : Editor
             }
             pancakes.Clear();
         }
+
+        if (GUILayout.Button("Detach all pancakes, destroy after 3 secs"))
+        {
+            foreach (var pancake in pancakes)
+            {
+                pancake.DetachPancake();
+                Destroy(pancake.gameObject, 3.0f);
+            }
+            pancakes.Clear();
+        }
     }
 }

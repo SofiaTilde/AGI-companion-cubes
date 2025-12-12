@@ -2,7 +2,6 @@ using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.XR.CoreUtils;
 using UnityEngine;
 
 [StructLayout(LayoutKind.Sequential)]
@@ -221,11 +220,7 @@ public class ChimeraPlugin : MonoBehaviour
 
     private void SetEnvironmentIntoPhysX()
     {
-        if (!isGenesis)
-        {
-            return;
-        }
-        var colliders = RoomRoot.GetComponents<BoxCollider>();
+        var colliders = RoomRoot.GetComponentsInChildren<BoxCollider>();
         foreach (var c in colliders)
         {
             if (c.isTrigger)
@@ -235,8 +230,8 @@ public class ChimeraPlugin : MonoBehaviour
             }
             var box = new BoundingBox
             {
-                position = c.center,
-                size = c.size,
+                position = c.transform.TransformPoint(c.center),
+                size = Vector3.Scale(c.transform.localScale, c.size)
             };
             SetStaticBox(box);
         }
